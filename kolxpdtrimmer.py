@@ -13,7 +13,7 @@ onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
 
 for i in onlyfiles:
 
-    if "copy" in i:
+    if ("copy" in i) or ("igor" in i):
         continue
     elif ".txt" in i:
         pass

@@ -44,19 +44,25 @@ for i in onlyfiles:
             currentdata = np.reshape(currentdata, currentdimensions)
             data.append(np.reshape(currentdata, currentdimensions))
 
-    #print(energies)
-    #print(dimensions)
 
-    image = np.empty(currentdimensions)
-    counter = 0
-    for energy in energies:
-        if (energy >=552 and energy <=554):         #plots the energies of all the
-            image = np.add(image, data[counter])
-        counter +=1
+    def plotslice(lowerE, upperE, currentextent):
+        image = np.empty(currentdimensions)
+        counter = 0
+        for energy in energies:
+            if (energy >= lowerE and energy <= upperE):  # plots the energies of all the
+                image = np.add(image, data[counter])
+            counter += 1
 
-    image = scipy.signal.medfilt(image, 3)
-    plt.imshow(image, 'gray')
-    plt.title(i)
-    plt.colorbar()
-    plt.show()
+        image = scipy.signal.medfilt(image, 3)
+        plt.imshow(image, 'jet', extent=currentextent)
+        plt.title(i)
+        plt.colorbar()
+        plt.xlabel('x [mm]')
+        plt.ylabel('y [mm]')
+        plt.savefig(mypath + '/' + i[:-4] + '.png')
+        plt.show()
+
+
+    plotslice(551, 554, [0, 2, 0, 2])
+
 
