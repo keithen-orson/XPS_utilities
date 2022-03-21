@@ -8,10 +8,15 @@ from tifffile import imsave
 '''
 This program loops through all of the snapshots and will visualize the time series of the scans of each different
 category of scans (o1s, ni2p, etc) based on the energy that they start with.  
+
 The program also removes outliers by removing the three edge detectors and anything that is three standard deviations away
 from the average value.
+
 The function to plot the different groups of scans can be modified to show time instead of temperature, but this is approximate
 as the snapshots are not taken at exact times or temperatures.  
+
+This program will work for either a folder full of snapshots or a folder full of scans with the same number of data points.  
+If the lengths of the scans are different, the master data table will break (could fix this later)
 '''
 
 mypath = input("input folder path: ")
@@ -106,7 +111,7 @@ for i in onlyfiles:
                 data[i,1] = np.NaN
 
     #actualy call the outlier remover function
-    remove_outliers(3, 3)
+    #remove_outliers(3, 3)
 
     #remove_outliers(3, 3)
     #This block of code adds just the intensity data to a master list in the same order the files are read
@@ -118,7 +123,7 @@ for i in onlyfiles:
     counter +=1
 
 
-def plot_snapshot_series(choose, mintemp, maxtemp):
+def plot_snapshot_series(choose, mintemp, maxtemp, medfilton):
 #choose which group of snapshots you want to plot.  This is the 2nd one in the list,
     indexes = []
     for i in range(len(startenergy)):
@@ -132,18 +137,18 @@ def plot_snapshot_series(choose, mintemp, maxtemp):
         index = indexes[i]
         plotdata.append(masterlist[index,:])
     print('plotting snapshots beginning at: '+str(1486.7-scantypes[choose]))
-
-    plotdata = scipy.signal.medfilt(plotdata, 3)
+    if medfilton:
+        plotdata = scipy.signal.medfilt(plotdata, 3)
 
     fig, ax = plt.subplots()
     end = len(scanenergies[choose])
     ax.imshow(plotdata, 'jet', extent=[1486.7-scanenergies[choose][0], 1486.7-scanenergies[choose][end-1],mintemp,maxtemp], aspect='auto', origin='lower')
     ax.set_xlabel('Binding energy (eV)')
-    ax.set_ylabel('Approximate temperature (degrees C)')
+    ax.set_ylabel('Experiment Time (s)')
     plt.savefig((mypath+'/'+str(choose)+'.tif'))
     plt.show()
     plt.colorbar
 
 
 for i in range(len(scantypes)):
-    plot_snapshot_series(i,20, 140)
+    plot_snapshot_series(i,0, 8200, False)
